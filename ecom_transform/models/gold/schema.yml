@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: dim_users
+    description: "User dimension table for analytical reporting"
+    columns:
+      - name: user_id
+        description: "Primary key for dim_users"
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_products
+    description: "Product dimension table with price tier segmentation"
+    columns:
+      - name: product_id
+        description: "Primary key for dim_products"
+        tests:
+          - unique
+          - not_null
+
+  - name: fact_orders
+    description: "Order header fact table with aggregated order totals and realized revenue"
+    columns:
+      - name: order_id
+        description: "Primary key for fact_orders"
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Foreign key to dim_users"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_users')
+              field: user_id
+
+  - name: fact_order_items
+    description: "Line-item grain fact table linking orders, users, and products"
+    columns:
+      - name: order_item_id
+        description: "Primary key for fact_order_items"
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: "Foreign key to fact_orders"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('fact_orders')
+              field: order_id
+      - name: user_id
+        description: "Foreign key to dim_users"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_users')
+              field: user_id
+      - name: product_id
+        description: "Foreign key to dim_products"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_products')
+              field: product_id
